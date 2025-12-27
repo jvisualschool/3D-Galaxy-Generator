@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GUI Comparison - Tweakpane vs Leva</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: #1a1a1a;
+        color: #fff;
+        overflow: hidden;
+      }
+
+      .container {
+        display: flex;
+        height: 100vh;
+      }
+
+      .panel {
+        flex: 1;
+        position: relative;
+        border-right: 2px solid #333;
+      }
+
+      .panel:last-child {
+        border-right: none;
+      }
+
+      .panel-header {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 10px 20px;
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+      }
+
+      .panel-header h2 {
+        font-size: 18px;
+        margin-bottom: 5px;
+      }
+
+      .panel-header p {
+        font-size: 12px;
+        color: #aaa;
+      }
+
+      #leva-gui {
+        right: calc(50% + 20px) !important;
+      }
+
+      #leva-bloom {
+        right: calc(50% + 270px) !important;
+      }
+
+      canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .comparison-header {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1001;
+        background: rgba(0, 0, 0, 0.8);
+        padding: 15px 30px;
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+        text-align: center;
+      }
+
+      .comparison-header h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+      }
+
+      .comparison-header p {
+        font-size: 14px;
+        color: #aaa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="comparison-header">
+      <h1>GUI 라이브러리 비교</h1>
+      <p>Tweakpane vs Leva</p>
+    </div>
+    
+    <div class="container">
+      <div class="panel">
+        <div class="panel-header">
+          <h2>✨ Tweakpane</h2>
+          <p>현대적이고 깔끔한 디자인</p>
+        </div>
+        <canvas id="canvas-tweakpane" class="webgl"></canvas>
+      </div>
+      
+      <div class="panel">
+        <div class="panel-header">
+          <h2>🎨 Leva</h2>
+          <p>미니멀하고 직관적인 UI</p>
+        </div>
+        <canvas id="canvas-leva" class="webgl"></canvas>
+      </div>
+    </div>
+
+    <script type="module">
+      // Tweakpane 버전
+      import * as THREE from 'three'
+      import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+      import { Pane } from 'tweakpane'
+      import Galaxy from './src/galaxy-tweakpane.js'
+      import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+      import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+      import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+
+      // Tweakpane Scene
+      const canvasTweakpane = document.getElementById('canvas-tweakpane')
+      const pane = new Pane({ title: 'Galaxy Controls', expanded: true })
+      const sceneTweakpane = new THREE.Scene()
+      
+      const sizesTweakpane = {
+        width: window.innerWidth / 2,
+        height: window.innerHeight
+      }
+
+      const cameraTweakpane = new THREE.PerspectiveCamera(75, sizesTweakpane.width / sizesTweakpane.height, 0.1, 100)
+      cameraTweakpane.position.set(3, 3, 3)
+      sceneTweakpane.add(cameraTweakpane)
+
+      const rendererTweakpane = new THREE.WebGLRenderer({ canvas: canvasTweakpane })
+      rendererTweakpane.setSize(sizesTweakpane.width, sizesTweakpane.height)
+      rendererTweakpane.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+      const controlsTweakpane = new OrbitControls(cameraTweakpane, canvasTweakpane)
+      controlsTweakpane.enableDamping = true
+
+      const galaxyTweakpane = new Galaxy(sceneTweakpane, pane)
+
+      const renderSceneTweakpane = new RenderPass(sceneTweakpane, cameraTweakpane)
+      const bloomPassTweakpane = new UnrealBloomPass(
+        new THREE.Vector2(sizesTweakpane.width, sizesTweakpane.height), 
+        1.5, 0.4, 0.85
+      )
+      bloomPassTweakpane.threshold = 0
+      bloomPassTweakpane.strength = 0.6
+      bloomPassTweakpane.radius = 0
+
+      const composerTweakpane = new EffectComposer(rendererTweakpane)
+      composerTweakpane.addPass(renderSceneTweakpane)
+      composerTweakpane.addPass(bloomPassTweakpane)
+
+      const bloomFolderTweakpane = pane.addFolder({ title: 'Bloom', expanded: false })
+      bloomFolderTweakpane.addBinding(bloomPassTweakpane, 'strength', { min: 0, max: 3, step: 0.01 })
+      bloomFolderTweakpane.addBinding(bloomPassTweakpane, 'radius', { min: 0, max: 1, step: 0.01 })
+      bloomFolderTweakpane.addBinding(bloomPassTweakpane, 'threshold', { min: 0, max: 1, step: 0.01 })
+
+      // Leva 버전 (Leva 스타일의 커스텀 GUI 사용)
+      import GalaxyLeva from './src/galaxy-leva.js'
+
+      const canvasLeva = document.getElementById('canvas-leva')
+      const guiLeva = { add: () => ({ on: () => {} }), set: () => {} } // Leva 스타일 래퍼
+      const sceneLeva = new THREE.Scene()
+      
+      const sizesLeva = {
+        width: window.innerWidth / 2,
+        height: window.innerHeight
+      }
+
+      const cameraLeva = new THREE.PerspectiveCamera(75, sizesLeva.width / sizesLeva.height, 0.1, 100)
+      cameraLeva.position.set(3, 3, 3)
+      sceneLeva.add(cameraLeva)
+
+      const rendererLeva = new THREE.WebGLRenderer({ canvas: canvasLeva })
+      rendererLeva.setSize(sizesLeva.width, sizesLeva.height)
+      rendererLeva.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+      const controlsLeva = new OrbitControls(cameraLeva, canvasLeva)
+      controlsLeva.enableDamping = true
+
+      const galaxyLeva = new GalaxyLeva(sceneLeva, guiLeva)
+
+      const renderSceneLeva = new RenderPass(sceneLeva, cameraLeva)
+      const bloomPassLeva = new UnrealBloomPass(
+        new THREE.Vector2(sizesLeva.width, sizesLeva.height), 
+        1.5, 0.4, 0.85
+      )
+      bloomPassLeva.threshold = 0
+      bloomPassLeva.strength = 0.6
+      bloomPassLeva.radius = 0
+
+      const composerLeva = new EffectComposer(rendererLeva)
+      composerLeva.addPass(renderSceneLeva)
+      composerLeva.addPass(bloomPassLeva)
+
+      // Leva 스타일의 Bloom GUI는 galaxy-leva.js에서 자동으로 생성됨
+      // 여기서는 간단한 이벤트 리스너만 추가
+
+      // Resize handler
+      window.addEventListener('resize', () => {
+        sizesTweakpane.width = window.innerWidth / 2
+        sizesTweakpane.height = window.innerHeight
+        sizesLeva.width = window.innerWidth / 2
+        sizesLeva.height = window.innerHeight
+
+        cameraTweakpane.aspect = sizesTweakpane.width / sizesTweakpane.height
+        cameraTweakpane.updateProjectionMatrix()
+        cameraLeva.aspect = sizesLeva.width / sizesLeva.height
+        cameraLeva.updateProjectionMatrix()
+
+        rendererTweakpane.setSize(sizesTweakpane.width, sizesTweakpane.height)
+        rendererLeva.setSize(sizesLeva.width, sizesLeva.height)
+
+        composerTweakpane.setSize(sizesTweakpane.width, sizesTweakpane.height)
+        composerLeva.setSize(sizesLeva.width, sizesLeva.height)
+      })
+
+      // Animation
+      const clock = new THREE.Clock()
+
+      const tick = () => {
+        const elapsedTime = clock.getElapsedTime()
+
+        galaxyTweakpane.update(elapsedTime)
+        galaxyLeva.update(elapsedTime)
+
+        controlsTweakpane.update()
+        controlsLeva.update()
+
+        composerTweakpane.render()
+        composerLeva.render()
+
+        window.requestAnimationFrame(tick)
+      }
+
+      tick()
+    </script>
+  </body>
+</html>
+

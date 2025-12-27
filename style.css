@@ -1,0 +1,38 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    overflow: hidden;
+    background: #000;
+}
+
+.webgl {
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+}
+
+/* 전체화면 모드에서 캔버스가 모니터 전체를 채우도록 */
+.webgl:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
+.webgl:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
+.webgl:-moz-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
+.webgl:-ms-fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+}
