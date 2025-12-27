@@ -167,20 +167,17 @@ npm run preview
 
 ## 📦 배포
 
-### jvibeschool.org 서버 배포
+### 빌드
 
 ```bash
-# 빌드 및 배포 (한 줄 명령어)
-npm run build && scp -i ~/.ssh/jvibeschool_org.pem -r ./dist/* bitnami@15.164.161.165:/opt/bitnami/apache/htdocs/GALAXY/
+npm run build
 ```
 
-### 배포 정보
+빌드된 파일은 `dist/` 폴더에 생성됩니다. 정적 호스팅 서비스(Netlify, Vercel, GitHub Pages 등)에 배포할 수 있습니다.
 
-| 항목 | 값 |
-|------|------|
-| **URL** | https://jvibeschool.org/GALAXY/ |
-| **서버** | 15.164.161.165 |
-| **경로** | /opt/bitnami/apache/htdocs/GALAXY/ |
+### 라이브 데모
+
+🔗 **데모**: [https://jvibeschool.org/GALAXY/](https://jvibeschool.org/GALAXY/)
 
 ---
 
